@@ -1,10 +1,11 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StyleSheet, Text, View } from "react-native";
 import { RootStackParamList } from "../constants/types";
-import { useLayoutEffect } from "react";
+import { useContext, useLayoutEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { GlobalStyles } from "../constants/styles";
 import Button from "../components/UI/Button";
+import { ExpensesContext } from "../store/expenses-context";
 
 type ManageExpenseProps = NativeStackScreenProps<
   RootStackParamList,
@@ -12,6 +13,9 @@ type ManageExpenseProps = NativeStackScreenProps<
 >;
 
 function ManageExpense({ route, navigation }: ManageExpenseProps) {
+  const { deleteExpense, updateExpense, addExpense } =
+    useContext(ExpensesContext);
+
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
 
@@ -22,6 +26,8 @@ function ManageExpense({ route, navigation }: ManageExpenseProps) {
   }, [navigation, isEditing]);
 
   function deleteExpenseHandler() {
+    if (!isEditing) return;
+    deleteExpense(editedExpenseId);
     navigation.goBack();
   }
 
@@ -30,6 +36,19 @@ function ManageExpense({ route, navigation }: ManageExpenseProps) {
   }
 
   function confirmHandler() {
+    if (isEditing) {
+      updateExpense(editedExpenseId, {
+        description: "Test!!!",
+        amount: 29.99,
+        date: new Date("2025-09-15"),
+      });
+    } else {
+      addExpense({
+        description: "Test",
+        amount: 19.99,
+        date: new Date("2025-09-16"),
+      });
+    }
     navigation.goBack();
   }
 
